@@ -453,7 +453,7 @@
 					let n = Math.max(2, Math.min(15, parseInt(countEl.value,10)||2));
 					// 현재 segments를 보존하면서 길이 조정
 					if (n > segments.length) {
-						segments = segments.concat(Array.from({length: n - segments.length}, (_, i) => `조각 ${segments.length + i + 1}`));
+						segments = segments.concat(Array.from({length: n - segments.length}, (_, i) => `${segments.length + i + 1}번`));
 					} else if (n < segments.length) {
 						segments = segments.slice(0, n);
 					}
@@ -825,6 +825,7 @@
 	</script>
 </body>
 </html>
+
 
 
 
