@@ -341,7 +341,7 @@
 
 				function readSegmentsFromInputs(){
 					const inputs = Array.from(segWrap.querySelectorAll('input'));
-					const arr = inputs.map(el => (el.value||'').trim()).map((v, i) => v || `조각 ${i+1}`);
+					const arr = inputs.map(el => (el.value||'').trim()).map((v, i) => v || `${i+1}번`);
 					segments = arr;
 				}
 
@@ -393,7 +393,7 @@
 					const a = (pointer - (angle % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
 					const safe = Math.min(a, (Math.PI*2) - 1e-10);
 					const index = Math.floor(safe/sectorSize) % n;
-					const name = (segments[index] && segments[index].trim()) ? segments[index] : `조각 ${index+1}`;
+					const name = (segments[index] && segments[index].trim()) ? segments[index] : `${index+1}번`;
 					return { index, name };
 				}
 
@@ -430,7 +430,7 @@
 						} else {
 							spinning = false;
 							setInputsDisabled(false);
-							const winner = (namesSnapshot[targetIndex] && namesSnapshot[targetIndex].trim()) ? namesSnapshot[targetIndex] : `조각 ${targetIndex+1}`;
+							const winner = (namesSnapshot[targetIndex] && namesSnapshot[targetIndex].trim()) ? namesSnapshot[targetIndex] : `${targetIndex+1}번`;
 							resultEl.textContent = `🎉 당첨: ${winner}`;
 							triggerConfetti();
 						}
@@ -480,10 +480,10 @@
 					if (n < 2) return;
 					const sector = (Math.PI*2)/n;
 					const idx = Math.max(0, Math.min(n-1, Math.floor(a/sector)));
-					const current = segments[idx] || `조각 ${idx+1}`;
-					const next = prompt('조각 이름을 입력하세요', current);
+					const current = segments[idx] || `${idx+1}번`;
+					const next = prompt('이름을 입력하세요', current);
 					if (next === null) return;
-					const name = (next || '').trim() || `조각 ${idx+1}`;
+					const name = (next || '').trim() || `${idx+1}번`;
 					segments[idx] = name;
 					const input = segWrap.querySelector(`input[data-index="${idx}"]`);
 					if (input) input.value = name;
@@ -825,5 +825,6 @@
 	</script>
 </body>
 </html>
+
 
 
