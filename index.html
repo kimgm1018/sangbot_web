@@ -332,7 +332,7 @@
 					for (let i=0;i<n;i++){
 						const input = document.createElement('input');
 						input.type = 'text';
-						input.placeholder = `조각 ${i+1} 이름`;
+						input.placeholder = `${i+1}번 이름`;
 						input.value = segments[i] || `${i+1}번`;
 						input.dataset.index = String(i);
 						segWrap.appendChild(input);
@@ -825,6 +825,7 @@
 	</script>
 </body>
 </html>
+
 
 
 
