@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>상봇.COM</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="sangbot.css">
+</head>
+<body>
+	<div class="app">
+		<aside class="sidebar" role="navigation" aria-label="상봇.COM 사이드바">
+			<div class="brand">상봇<span class="dot">.COM</span></div>
+			<nav class="nav">
+				<button class="nav-item active" data-target="#ck">🎮 롤 CK</button>
+				<button class="nav-item" data-target="#lottery">🎲 복불복</button>
+				<button class="nav-item" data-target="#wheel">🧭 원판 돌리기</button>
+				<button class="nav-item" data-target="#ladder">🪜 사다리 타기</button>
+			</nav>
+			<div class="note">
+				<p>하늘색 테마 · 깔끔한 유틸 모음</p>
+			</div>
+		</aside>
+
+		<main class="content">
+			<header class="page-header">
+				<h1>상봇.COM</h1>
+				<p>디스코드 상봇 기능을 웹에서 간편하게</p>
+			</header>
+
+			<section id="ck" class="panel visible" aria-labelledby="ck-title">
+				<h2 id="ck-title">롤 CK 팀 구성</h2>
+				<p class="help">각 라인에 닉네임을 입력하세요. 고정하려면 체크를 활성화하세요.</p>
+				<div class="ck-grid">
+					<div class="team-col">
+						<h3 class="team-title red">Red 팀</h3>
+						<div class="pos">
+							<label>TOP</label>
+							<input type="text" id="red-0" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="red-fix-0"> 고정</label>
+						</div>
+						<div class="pos">
+							<label>JUNGLE</label>
+							<input type="text" id="red-1" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="red-fix-1"> 고정</label>
+						</div>
+						<div class="pos">
+							<label>MID</label>
+							<input type="text" id="red-2" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="red-fix-2"> 고정</label>
+						</div>
+						<div class="pos">
+							<label>AD</label>
+							<input type="text" id="red-3" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="red-fix-3"> 고정</label>
+						</div>
+						<div class="pos">
+							<label>SUPPORT</label>
+							<input type="text" id="red-4" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="red-fix-4"> 고정</label>
+						</div>
+					</div>
+
+					<div class="team-col">
+						<h3 class="team-title blue">Blue 팀</h3>
+						<div class="pos">
+							<label>TOP</label>
+							<input type="text" id="blue-0" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="blue-fix-0"> 고정</label>
+						</div>
+						<div class="pos">
+							<label>JUNGLE</label>
+							<input type="text" id="blue-1" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="blue-fix-1"> 고정</label>
+						</div>
+						<div class="pos">
+							<label>MID</label>
+							<input type="text" id="blue-2" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="blue-fix-2"> 고정</label>
+						</div>
+						<div class="pos">
+							<label>AD</label>
+							<input type="text" id="blue-3" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="blue-fix-3"> 고정</label>
+						</div>
+						<div class="pos">
+							<label>SUPPORT</label>
+							<input type="text" id="blue-4" placeholder="닉네임">
+							<label class="fix"><input type="checkbox" id="blue-fix-4"> 고정</label>
+						</div>
+					</div>
+				</div>
+
+				<div class="actions">
+					<button id="ck-run" class="btn primary">팀 구성하기</button>
+					<button id="ck-reset" class="btn">초기화</button>
+				</div>
+
+				<pre class="result" id="ck-result" aria-live="polite"></pre>
+			</section>
+
+			<section id="lottery" class="panel" aria-labelledby="lottery-title">
+				<h2 id="lottery-title">복불복 추첨</h2>
+				<div class="lottery-form">
+					<div class="field">
+						<label for="lottery-names">명단 (띄어쓰기 또는 줄바꿈)</label>
+						<textarea id="lottery-names" rows="4" placeholder="예) 상보 산하 상인 강민 ..."></textarea>
+					</div>
+					<div class="row">
+						<div class="field sm">
+							<label for="lottery-k">추첨 인원 수</label>
+							<input type="number" id="lottery-k" min="1" value="1">
+						</div>
+						<div class="field sm">
+							<label>추첨 방법</label>
+							<div class="radios">
+								<label><input type="radio" name="how" value="dup" checked> 중복 허용</label>
+								<label><input type="radio" name="how" value="nodup"> 중복 비허용</label>
+							</div>
+						</div>
+					</div>
+
+					<div class="actions">
+						<button id="lottery-run" class="btn primary">추첨하기</button>
+						<button id="lottery-reroll" class="btn" disabled>다시 뽑기</button>
+					</div>
+
+					<pre class="result" id="lottery-result" aria-live="polite"></pre>
+				</div>
+			</section>
+
+			<section id="wheel" class="panel" aria-labelledby="wheel-title">
+				<h2 id="wheel-title">원판 돌리기</h2>
+				<p class="help">인원 수를 정하고 이름을 입력한 다음 원판을 돌리세요.</p>
+				<div class="wheel-wrap">
+					<div class="wheel-side">
+						<canvas id="wheel-canvas" width="380" height="380" aria-label="추첨 원판" role="img"></canvas>
+						<canvas id="wheel-confetti" width="380" height="380" aria-hidden="true"></canvas>
+						<div class="wheel-pointer" aria-hidden="true">▼</div>
+					</div>
+					<div class="wheel-form">
+						<div class="field sm">
+							<label for="wheel-count">인원 수</label>
+						<input type="number" id="wheel-count" min="2" max="15" value="2">
+						</div>
+						<div id="wheel-segments" class="segments-grid" aria-live="polite"></div>
+						<div class="actions">
+							<button id="wheel-spin" class="btn primary">돌리기</button>
+							<button id="wheel-reset" class="btn">초기화</button>
+						</div>
+						<pre class="result" id="wheel-result" aria-live="polite"></pre>
+					</div>
+				</div>
+			</section>
+
+			<section id="ladder" class="panel" aria-labelledby="ladder-title">
+				<h2 id="ladder-title">사다리 타기</h2>
+				<p class="help">인원 수를 입력하고 이름과 하단 결과를 채운 뒤 사다리를 타세요.</p>
+				<div class="ladder-wrap">
+					<div class="ladder-form">
+						<div class="field sm">
+							<label for="ladder-count">인원 수</label>
+					<input type="number" id="ladder-count" min="2" max="15" value="2">
+						</div>
+						<div id="ladder-names" class="segments-grid" aria-label="이름 입력칸"></div>
+						<div id="ladder-foots" class="segments-grid" aria-label="하단 결과 입력칸"></div>
+						<div class="actions">
+							<button id="ladder-run" class="btn primary">사다리 타기</button>
+							<div id="ladder-person-buttons" class="person-buttons"></div>
+							<button id="ladder-reset" class="btn">초기화</button>
+						</div>
+					</div>
+					<div class="ladder-side">
+						<canvas id="ladder-canvas" width="560" height="420" aria-label="사다리" role="img"></canvas>
+					</div>
+				</div>
+				<pre class="result" id="ladder-result" aria-live="polite"></pre>
+			</section>
+		</main>
+	</div>
+
+	<script>
+		// 네비게이션 전환
+		document.querySelectorAll('.nav-item').forEach(btn => {
+			btn.addEventListener('click', () => {
+				document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+				document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
+				btn.classList.add('active');
+				const target = document.querySelector(btn.dataset.target);
+				if (target) target.classList.add('visible');
+			});
+		});
+
+		// 유틸
+		function shuffle(array) {
+			for (let i = array.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
+			}
+
+			// 공용: 텍스트영역 내용을 원판 입력으로 복사
+			document.getElementById('lottery-names')?.addEventListener('input', (e) => {
+				const val = (e.target.value||'');
+				const wheelInput = document.getElementById('wheel-names');
+				if (wheelInput && !wheelInput.value) {
+					wheelInput.value = val;
+				}
+			});
+			return array;
+		}
+
+		// 롤 CK 로직 (Discord 봇 로직을 웹으로 이식)
+		document.getElementById('ck-run').addEventListener('click', () => {
+			const positions = ["TOP","JUNGLE","MID","AD","SUPPORT"];
+			const redFixed = new Array(5).fill(null);
+			const blueFixed = new Array(5).fill(null);
+			const redPool = [];
+			const bluePool = [];
+
+			for (let i = 0; i < 5; i++) {
+				const rName = (document.getElementById(`red-${i}`).value || '').trim();
+				const rFix = document.getElementById(`red-fix-${i}`).checked;
+				const bName = (document.getElementById(`blue-${i}`).value || '').trim();
+				const bFix = document.getElementById(`blue-fix-${i}`).checked;
+
+				if (!rName || !bName) {
+					alert('각 팀의 모든 라인에 닉네임을 입력해주세요. (총 10명)');
+					return;
+				}
+
+				if (rFix) redFixed[i] = rName; else redPool.push(rName);
+				if (bFix) blueFixed[i] = bName; else bluePool.push(bName);
+			}
+
+			shuffle(redPool);
+			shuffle(bluePool);
+
+			for (let i = 0; i < 5; i++) {
+				if (redFixed[i] === null) redFixed[i] = redPool.pop();
+				if (blueFixed[i] === null) blueFixed[i] = bluePool.pop();
+			}
+
+			let lines = [];
+			for (let i = 0; i < 5; i++) {
+				lines.push(`Red팀 ${positions[i]} : ${redFixed[i]}  -  Blue팀 ${positions[i]} : ${blueFixed[i]}`);
+			}
+			document.getElementById('ck-result').textContent = lines.join('\n');
+		});
+
+		document.getElementById('ck-reset').addEventListener('click', () => {
+			for (let i = 0; i < 5; i++) {
+				document.getElementById(`red-${i}`).value = '';
+				document.getElementById(`blue-${i}`).value = '';
+				document.getElementById(`red-fix-${i}`).checked = false;
+				document.getElementById(`blue-fix-${i}`).checked = false;
+			}
+			document.getElementById('ck-result').textContent = '';
+		});
+
+			// 복불복 로직
+		let lastLotteryState = null; // { names, k, allowDuplicate }
+
+		function getLotteryResult(names, k, allowDuplicate) {
+			if (allowDuplicate) {
+				const selected = [];
+				for (let i = 0; i < k; i++) selected.push(names[Math.floor(Math.random()*names.length)]);
+				const counter = {};
+				for (const n of selected) counter[n] = (counter[n]||0)+1;
+				const sorted = Object.entries(counter).sort((a,b)=>b[1]-a[1]);
+				const lines = sorted.map(([n,c])=>`${n} : ${c}회`);
+				const topCount = sorted[0][1];
+				const topNames = sorted.filter(([,c])=>c===topCount).map(([n])=>n);
+				if (topNames.length === 1) lines.push(`\n🎉 당첨: ${topNames[0]} (${topCount}회)`);
+				else lines.push(`\n⚖️ 무승부: ${topNames.join(', ')} (${topCount}회씩)`);
+				return lines.join('\n');
+			} else {
+				const pool = [...names];
+				shuffle(pool);
+				return pool.slice(0, k).join('\n');
+			}
+		}
+
+		document.getElementById('lottery-run').addEventListener('click', () => {
+			const raw = (document.getElementById('lottery-names').value || '').trim();
+			const names = raw.split(/\s+/).filter(Boolean);
+			const k = parseInt(document.getElementById('lottery-k').value, 10) || 0;
+			const how = document.querySelector('input[name="how"]:checked').value;
+			const allowDuplicate = (how === 'dup');
+
+			if (!names.length || k < 1) {
+				alert('명단과 추첨 인원 수를 올바르게 입력해주세요.');
+				return;
+			}
+			if (!allowDuplicate && k > names.length) {
+				alert('추첨 인원이 명단보다 많습니다. (중복 비허용)');
+				return;
+			}
+
+			lastLotteryState = { names, k, allowDuplicate };
+			document.getElementById('lottery-reroll').disabled = false;
+			document.getElementById('lottery-result').textContent = getLotteryResult(names, k, allowDuplicate);
+		});
+
+		document.getElementById('lottery-reroll').addEventListener('click', () => {
+			if (!lastLotteryState) return;
+			document.getElementById('lottery-result').textContent = getLotteryResult(lastLotteryState.names, lastLotteryState.k, lastLotteryState.allowDuplicate);
+		});
+
+			// 원판 돌리기 로직
+			(function initWheel(){
+				const canvas = document.getElementById('wheel-canvas');
+				if (!canvas) return; // 섹션 비표시일 수 있음
+				const ctx = canvas.getContext('2d');
+				const resultEl = document.getElementById('wheel-result');
+				const spinBtn = document.getElementById('wheel-spin');
+				const resetBtn = document.getElementById('wheel-reset');
+				const countEl = document.getElementById('wheel-count');
+				const segWrap = document.getElementById('wheel-segments');
+
+				let segments = Array.from({length: Math.max(2, Math.min(15, parseInt(countEl.value,10)||2))}, (_, i) => `${i+1}번`);
+				let colors = ['#ffcc80','#ffab91','#80deea','#c5e1a5','#f48fb1','#b39ddb','#ffe082','#a5d6a7'];
+				let angle = 0; // 현재 라디안 각도
+				let spinning = false;
+				let rafId = null;
+				const DEFAULT_ROUNDS = 5; // 고정 회전수
+				const DEFAULT_DURATION = 3; // 고정 지속시간(초)
+
+				function buildSegmentInputs(n){
+					segWrap.innerHTML = '';
+					for (let i=0;i<n;i++){
+						const input = document.createElement('input');
+						input.type = 'text';
+						input.placeholder = `조각 ${i+1} 이름`;
+						input.value = segments[i] || `${i+1}번`;
+						input.dataset.index = String(i);
+						segWrap.appendChild(input);
+					}
+				}
+
+				function readSegmentsFromInputs(){
+					const inputs = Array.from(segWrap.querySelectorAll('input'));
+					const arr = inputs.map(el => (el.value||'').trim()).map((v, i) => v || `조각 ${i+1}`);
+					segments = arr;
+				}
+
+				function drawWheel(){
+					const w = canvas.width, h = canvas.height;
+					const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 6;
+					ctx.clearRect(0,0,w,h);
+					ctx.save();
+					ctx.translate(cx, cy);
+					ctx.rotate(angle);
+					const n = segments.length;
+					for (let i=0;i<n;i++){
+						const start = i * (Math.PI*2/n);
+						const end = (i+1) * (Math.PI*2/n);
+						ctx.beginPath();
+						ctx.moveTo(0,0);
+						ctx.arc(0,0,r,start,end);
+						ctx.closePath();
+						ctx.fillStyle = colors[i % colors.length];
+						ctx.fill();
+
+						// 텍스트
+						ctx.save();
+						ctx.rotate(start + (end-start)/2);
+						ctx.translate(r*0.68,0);
+						ctx.rotate(Math.PI/2);
+						ctx.fillStyle = '#0c2940';
+						ctx.font = 'bold 14px "Noto Sans KR", Arial';
+						ctx.textAlign = 'center';
+						ctx.textBaseline = 'middle';
+						const label = segments[i];
+						ctx.fillText(label,0,0);
+						ctx.restore();
+					}
+					ctx.restore();
+				}
+
+				function setInputsDisabled(disabled){
+					Array.from(segWrap.querySelectorAll('input')).forEach(i => { i.disabled = disabled; });
+					countEl.disabled = disabled;
+				}
+
+				function pickByAngle(){
+					const n = segments.length;
+					if (n < 2) return { index: -1, name: undefined };
+					// 포인터는 12시 방향(▼가 위에 있고 아래를 가리킴): 각도 -π/2
+					const sectorSize = (Math.PI*2)/n;
+					const pointer = -Math.PI/2;
+					const a = (pointer - (angle % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+					const safe = Math.min(a, (Math.PI*2) - 1e-10);
+					const index = Math.floor(safe/sectorSize) % n;
+					const name = (segments[index] && segments[index].trim()) ? segments[index] : `조각 ${index+1}`;
+					return { index, name };
+				}
+
+				function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+				function spin(){
+					if (spinning) return;
+					readSegmentsFromInputs();
+					colors = colors.concat(colors).slice(0, Math.max(colors.length, segments.length));
+					resultEl.textContent = '';
+					let rounds = DEFAULT_ROUNDS;
+					let duration = DEFAULT_DURATION; // 초
+					const startAngle = angle % (Math.PI*2);
+					const namesSnapshot = segments.slice();
+					const n = namesSnapshot.length;
+					const targetIndex = Math.floor(Math.random()*n);
+					const sector = (Math.PI*2)/n;
+					// 포인터(12시, ▼가 위에서 휘를 가리킴)가 targetIndex 중앙을 가리키도록 최종 angle 계산
+					const pointer = -Math.PI/2;
+					const desired = pointer - (targetIndex + 0.5) * sector; // 최종 angle
+					const delta = ((desired - startAngle) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+					const totalRotation = rounds*(Math.PI*2) + delta;
+					const start = performance.now();
+					spinning = true;
+					setInputsDisabled(true);
+
+					function frame(now){
+						const t = Math.min(1, (now - start)/(duration*1000));
+						const eased = easeOutCubic(t);
+						angle = startAngle + totalRotation * eased;
+						drawWheel();
+						if (t < 1){
+							rafId = requestAnimationFrame(frame);
+						} else {
+							spinning = false;
+							setInputsDisabled(false);
+							const winner = (namesSnapshot[targetIndex] && namesSnapshot[targetIndex].trim()) ? namesSnapshot[targetIndex] : `조각 ${targetIndex+1}`;
+							resultEl.textContent = `🎉 당첨: ${winner}`;
+							triggerConfetti();
+						}
+					}
+					rafId = requestAnimationFrame(frame);
+				}
+
+				function reset(){
+					if (spinning && rafId) cancelAnimationFrame(rafId);
+					spinning = false;
+					angle = 0;
+					resultEl.textContent = '';
+					drawWheel();
+				}
+
+				// 초기 세팅
+				buildSegmentInputs(parseInt(countEl.value,10)||2);
+				drawWheel();
+				countEl.addEventListener('change', () => {
+					let n = Math.max(2, Math.min(15, parseInt(countEl.value,10)||2));
+					// 현재 segments를 보존하면서 길이 조정
+					if (n > segments.length) {
+						segments = segments.concat(Array.from({length: n - segments.length}, (_, i) => `조각 ${segments.length + i + 1}`));
+					} else if (n < segments.length) {
+						segments = segments.slice(0, n);
+					}
+					buildSegmentInputs(n);
+					drawWheel();
+				});
+				spinBtn.addEventListener('click', spin);
+				resetBtn.addEventListener('click', reset);
+				// 조각 클릭 → 이름 편집
+				canvas.addEventListener('click', (ev) => {
+					if (spinning) return;
+					const rect = canvas.getBoundingClientRect();
+					const x = ev.clientX - rect.left;
+					const y = ev.clientY - rect.top;
+					const cx = canvas.width/2, cy = canvas.height/2;
+					const dx = x - cx, dy = y - cy;
+					const r = Math.min(canvas.width, canvas.height)/2 - 6;
+					const dist = Math.hypot(dx, dy);
+					if (dist < 20 || dist > r + 6) return; // 중심부/외곽 클릭 무시
+					const raw = Math.atan2(dy, dx); // 3시=0, CCW 증가
+					// 드로잉 시 angle만큼 회전했으므로 반대로 보정해 드로잉 좌표계 각도로 환산
+					const a = (raw - angle + Math.PI*2) % (Math.PI*2);
+					const n = segments.length;
+					if (n < 2) return;
+					const sector = (Math.PI*2)/n;
+					const idx = Math.max(0, Math.min(n-1, Math.floor(a/sector)));
+					const current = segments[idx] || `조각 ${idx+1}`;
+					const next = prompt('조각 이름을 입력하세요', current);
+					if (next === null) return;
+					const name = (next || '').trim() || `조각 ${idx+1}`;
+					segments[idx] = name;
+					const input = segWrap.querySelector(`input[data-index="${idx}"]`);
+					if (input) input.value = name;
+					drawWheel();
+				});
+				// 컨페티 이펙트
+				const confettiCanvas = document.getElementById('wheel-confetti');
+				const cctx = confettiCanvas.getContext('2d');
+				function triggerConfetti(){
+					const W = confettiCanvas.width, H = confettiCanvas.height;
+					const N = 120;
+					const parts = Array.from({length: N}, ()=>({
+						x: W/2,
+						y: H/2,
+						vx: (Math.random()*2-1)*220,
+						vy: (Math.random()*2-1)*220 - 120,
+						size: 3 + Math.random()*3,
+						color: `hsl(${Math.floor(Math.random()*360)}, 80%, 60%)`,
+						rot: Math.random()*Math.PI*2,
+						vr: (Math.random()*2-1)*6
+					}));
+					let last = performance.now();
+					const startTs = last;
+					function step(now){
+						const dt = Math.min(0.05, (now - last)/1000);
+						last = now;
+						cctx.clearRect(0,0,W,H);
+						for (const p of parts){
+							p.vy += 380*dt; // gravity
+							p.x += p.vx*dt;
+							p.y += p.vy*dt;
+							p.rot += p.vr*dt;
+							cctx.save();
+							cctx.translate(p.x, p.y);
+							cctx.rotate(p.rot);
+							cctx.fillStyle = p.color;
+							cctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+							cctx.restore();
+						}
+						if (now - startTs < 1500){
+							requestAnimationFrame(step);
+						} else {
+							cctx.clearRect(0,0,W,H);
+						}
+					}
+					requestAnimationFrame(step);
+				}
+			})();
+
+			// 사다리 타기 로직
+			(function initLadder(){
+				const canvas = document.getElementById('ladder-canvas');
+				if (!canvas) return;
+				const ctx = canvas.getContext('2d');
+				const countEl = document.getElementById('ladder-count');
+				const namesWrap = document.getElementById('ladder-names');
+				const footsWrap = document.getElementById('ladder-foots');
+				const runBtn = document.getElementById('ladder-run');
+				const resetBtn = document.getElementById('ladder-reset');
+				const resultEl = document.getElementById('ladder-result');
+
+				let columns = 5;
+				let verticals = []; // x 좌표
+				let rungs = []; // 가로발 [{y, i}] i는 왼쪽 세로선 인덱스
+				const padding = { left: 40, right: 40, top: 30, bottom: 30 };
+
+				function buildInputs(n){
+					namesWrap.innerHTML = '';
+					footsWrap.innerHTML = '';
+					for (let i=0;i<n;i++){
+						const name = document.createElement('input');
+						name.type = 'text';
+						name.placeholder = `이름 ${i+1}`;
+						namesWrap.appendChild(name);
+						const foot = document.createElement('input');
+						foot.type = 'text';
+						foot.placeholder = `결과 ${i+1}`;
+						footsWrap.appendChild(foot);
+					}
+				}
+
+				function generateLadder(n){
+					columns = n;
+					verticals = [];
+					rungs = [];
+					const w = canvas.width - padding.left - padding.right;
+					const h = canvas.height - padding.top - padding.bottom;
+					for (let i=0;i<n;i++){
+						verticals.push(padding.left + (w * i)/(n-1));
+					}
+					// 랜덤 가로발 생성 (세로선 사이에 일정 수)
+					const rungPerGap = Math.max(1, Math.floor(h/80));
+					for (let i=0;i<n-1;i++){
+						const count = rungPerGap;
+						for (let k=0;k<count;k++){
+							const y = padding.top + Math.random()*h;
+							rungs.push({ y, i });
+						}
+					}
+					// y 기준 정렬로 교차 최소화
+					rungs.sort((a,b)=>a.y-b.y);
+				}
+
+				function drawLadder(){
+					ctx.clearRect(0,0,canvas.width,canvas.height);
+					ctx.lineWidth = 3.5;
+					ctx.strokeStyle = '#2a5573';
+					// 세로선
+					for (const x of verticals){
+						ctx.beginPath();
+						ctx.moveTo(x, padding.top);
+						ctx.lineTo(x, canvas.height - padding.bottom);
+						ctx.stroke();
+					}
+					// 가로발
+					ctx.lineWidth = 3;
+					for (const r of rungs){
+						const x1 = verticals[r.i];
+						const x2 = verticals[r.i+1];
+						ctx.beginPath();
+						ctx.moveTo(x1, r.y);
+						ctx.lineTo(x2, r.y);
+						ctx.stroke();
+					}
+					// 라벨 (상단 이름, 하단 결과)
+					const nameInputs = Array.from(namesWrap.querySelectorAll('input'));
+					const footInputs = Array.from(footsWrap.querySelectorAll('input'));
+					ctx.fillStyle = '#074b78';
+					ctx.font = 'bold 12px "Noto Sans KR", Arial';
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'bottom';
+					for (let i=0;i<verticals.length;i++){
+						const x = verticals[i];
+						const topLabel = (nameInputs[i]?.value || `이름 ${i+1}`);
+						ctx.fillText(topLabel, x, padding.top - 8);
+					}
+					ctx.textBaseline = 'top';
+					for (let i=0;i<verticals.length;i++){
+						const x = verticals[i];
+						const botLabel = (footInputs[i]?.value || `결과 ${i+1}`);
+						ctx.fillText(botLabel, x, canvas.height - padding.bottom + 8);
+					}
+				}
+
+				function computePath(startIdx){
+					const segments = [];
+					let x = verticals[startIdx];
+					let y = padding.top;
+					for (const r of rungs){
+						if (r.y <= y) continue;
+						// 수직 이동
+						segments.push({ x1: x, y1: y, x2: x, y2: r.y });
+						y = r.y;
+						// 좌우 가로 이동
+						if (Math.abs(x - verticals[r.i]) < 1e-6){
+							segments.push({ x1: x, y1: y, x2: verticals[r.i+1], y2: y });
+							x = verticals[r.i+1];
+						} else if (Math.abs(x - verticals[r.i+1]) < 1e-6){
+							segments.push({ x1: x, y1: y, x2: verticals[r.i], y2: y });
+							x = verticals[r.i];
+						}
+					}
+					// 바닥까지 수직 이동
+					segments.push({ x1: x, y1: y, x2: x, y2: canvas.height - padding.bottom });
+					return segments;
+				}
+
+				function animatePath(segments, onDone){
+					const speed = 320; // px/s
+					let segIdx = 0;
+					let segT = 0;
+					let last = performance.now();
+					function step(now){
+						const dt = Math.min(0.05, (now - last)/1000);
+						last = now;
+						// 진행
+						let cur = segments[segIdx];
+						const dx = cur.x2 - cur.x1;
+						const dy = cur.y2 - cur.y1;
+						const len = Math.hypot(dx, dy) || 0.0001;
+						segT += (speed * dt) / len;
+						if (segT >= 1){
+							segT = 0;
+							segIdx++;
+							if (segIdx >= segments.length){
+								drawLadder();
+								if (onDone) onDone();
+								return;
+							}
+							cur = segments[segIdx];
+						}
+						// 렌더
+						drawLadder();
+						ctx.save();
+						ctx.lineWidth = 4;
+						ctx.strokeStyle = '#ff7043';
+						ctx.beginPath();
+						for (let i=0;i<segIdx;i++){
+							ctx.moveTo(segments[i].x1, segments[i].y1);
+							ctx.lineTo(segments[i].x2, segments[i].y2);
+						}
+						// 현재 세그먼트 진행 중인 선
+						const cx = cur.x1 + (cur.x2 - cur.x1) * segT;
+						const cy = cur.y1 + (cur.y2 - cur.y1) * segT;
+						ctx.moveTo(cur.x1, cur.y1);
+						ctx.lineTo(cx, cy);
+						ctx.stroke();
+						// 이동 점
+						ctx.fillStyle = '#ef5350';
+						ctx.beginPath();
+						ctx.arc(cx, cy, 5, 0, Math.PI*2);
+						ctx.fill();
+						ctx.restore();
+						requestAnimationFrame(step);
+					}
+					requestAnimationFrame(step);
+				}
+
+				function setDisabled(dis){
+					Array.from(namesWrap.querySelectorAll('input')).forEach(i=>i.disabled=dis);
+					Array.from(footsWrap.querySelectorAll('input')).forEach(i=>i.disabled=dis);
+					countEl.disabled = dis;
+					runBtn.disabled = dis;
+					resetBtn.disabled = dis;
+				}
+
+				function runOnce(){
+					const nameInputs = Array.from(namesWrap.querySelectorAll('input'));
+					const footInputs = Array.from(footsWrap.querySelectorAll('input'));
+					const names = nameInputs.map((el,i)=> (el.value||`이름 ${i+1}`));
+					const foots = footInputs.map((el,i)=> (el.value||`결과 ${i+1}`));
+					const hTop = padding.top;
+					const hBot = canvas.height - padding.bottom;
+					// 각 세로선 시작에서 추적
+					const mapping = new Array(columns);
+					for (let c=0;c<columns;c++){
+						let x = verticals[c];
+						let y = hTop;
+						for (const r of rungs){
+							if (r.y <= y) continue;
+							// 다음 가로발까지 수직 이동
+							y = r.y;
+							// 가로발을 만나면 좌우 이동
+							if (Math.abs(x - verticals[r.i]) < 1e-6){
+								x = verticals[r.i+1];
+							} else if (Math.abs(x - verticals[r.i+1]) < 1e-6){
+								x = verticals[r.i];
+							}
+						}
+						// 바닥까지 도달
+						mapping[c] = verticals.findIndex(v => Math.abs(v - x) < 1e-6);
+					}
+					// 결과 문자열 구성
+					const lines = mapping.map((toIdx, fromIdx)=> `${names[fromIdx]} → ${foots[toIdx]}`);
+					resultEl.textContent = lines.join('\n');
+					// 그리기 새로고침
+					drawLadder();
+				}
+
+				function runAnimated(){
+					const nameInputs = Array.from(namesWrap.querySelectorAll('input'));
+					const footInputs = Array.from(footsWrap.querySelectorAll('input'));
+					const names = nameInputs.map((el,i)=> (el.value||`이름 ${i+1}`));
+					const foots = footInputs.map((el,i)=> (el.value||`결과 ${i+1}`));
+					setDisabled(true);
+					const paths = [];
+					for (let i=0;i<columns;i++) paths.push(computePath(i));
+					const mapping = new Array(columns);
+					function destIndexForPath(path){
+						const last = path[path.length-1];
+						const destX = last.x2;
+						return verticals.findIndex(v => Math.abs(v - destX) < 1e-6);
+					}
+					let cur = 0;
+					function next(){
+						if (cur >= columns){
+							const lines = mapping.map((toIdx, fromIdx)=> `${names[fromIdx]} → ${foots[toIdx]}`);
+							resultEl.textContent = lines.join('\n');
+							setDisabled(false);
+							return;
+						}
+						animatePath(paths[cur], ()=>{
+							mapping[cur] = destIndexForPath(paths[cur]);
+							cur++;
+							next();
+						});
+					}
+					drawLadder();
+					next();
+				}
+
+				// 초기화 및 이벤트
+				function rebuild(){
+					const n = Math.max(2, Math.min(15, parseInt(countEl.value,10)||2));
+					buildInputs(n);
+					generateLadder(n);
+					drawLadder();
+					// 개인 실행 버튼 생성
+					const btnWrap = document.getElementById('ladder-person-buttons');
+					if (btnWrap){
+						btnWrap.innerHTML = '';
+						for (let i=0;i<n;i++){
+							const b = document.createElement('button');
+							b.className = 'btn';
+							b.textContent = `시작 ${i+1}`;
+							b.addEventListener('click', ()=> runOneAnimated(i));
+							btnWrap.appendChild(b);
+						}
+					}
+				}
+
+				rebuild();
+				countEl.addEventListener('change', rebuild);
+				runBtn.addEventListener('click', runAnimated);
+
+				function runOneAnimated(idx){
+					const nameInputs = Array.from(namesWrap.querySelectorAll('input'));
+					const footInputs = Array.from(footsWrap.querySelectorAll('input'));
+					const names = nameInputs.map((el,i)=> (el.value||`이름 ${i+1}`));
+					const foots = footInputs.map((el,i)=> (el.value||`결과 ${i+1}`));
+					setDisabled(true);
+					const path = computePath(idx);
+					function destIndexForPath(path){
+						const last = path[path.length-1];
+						const destX = last.x2;
+						return verticals.findIndex(v => Math.abs(v - destX) < 1e-6);
+					}
+					animatePath(path, ()=>{
+						const toIdx = destIndexForPath(path);
+						resultEl.textContent = `${names[idx]} → ${foots[toIdx]}`;
+						setDisabled(false);
+					});
+				}
+				resetBtn.addEventListener('click', ()=>{
+					resultEl.textContent = '';
+					rebuild();
+				});
+			})();
+	</script>
+</body>
+</html>
+
