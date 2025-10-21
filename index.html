@@ -12,12 +12,16 @@
 <body>
 	<div class="app">
 		<aside class="sidebar" role="navigation" aria-label="상봇.COM 사이드바">
-			<div class="brand">상봇<span class="dot">.COM</span></div>
+			<div class="brand">
+				<img src="favicon.png" alt="상봇 로고" class="brand-logo">
+				상봇<span class="dot">.COM</span>
+			</div>
 			<nav class="nav">
 				<button class="nav-item active" data-target="#ck">🎮 롤 CK</button>
 				<button class="nav-item" data-target="#lottery">🎲 복불복</button>
 				<button class="nav-item" data-target="#wheel">🧭 원판 돌리기</button>
 				<button class="nav-item" data-target="#ladder">🪜 사다리 타기</button>
+				<button class="nav-item" data-target="#reaction">⚡ 반응속도 테스트</button>
 			</nav>
 			<div class="note">
 				<p>하늘색 테마 · 깔끔한 유틸 모음</p>
@@ -177,6 +181,39 @@
 					</div>
 				</div>
 				<pre class="result" id="ladder-result" aria-live="polite"></pre>
+			</section>
+
+			<section id="reaction" class="panel" aria-labelledby="reaction-title">
+				<h2 id="reaction-title">반응속도 테스트</h2>
+				<p class="help">빨간색일 때는 클릭하지 마세요! 초록색으로 바뀌면 빠르게 클릭하세요.</p>
+				
+				<div class="reaction-container">
+					<div id="reaction-box" class="reaction-box">
+						<div class="reaction-text">클릭하여 시작</div>
+					</div>
+					
+					<div class="reaction-info">
+						<div class="reaction-stats">
+							<div class="stat-item">
+								<span class="stat-label">현재 시도:</span>
+								<span id="current-attempt">0</span>/5
+							</div>
+							<div class="stat-item">
+								<span class="stat-label">최고 기록:</span>
+								<span id="best-time">-</span>ms
+							</div>
+						</div>
+						
+						<div class="reaction-times" id="reaction-times"></div>
+						
+						<div class="reaction-actions">
+							<button id="reaction-start" class="btn primary">테스트 시작</button>
+							<button id="reaction-reset" class="btn">초기화</button>
+						</div>
+					</div>
+				</div>
+				
+				<pre class="result" id="reaction-result" aria-live="polite"></pre>
 			</section>
 		</main>
 	</div>
@@ -910,6 +947,174 @@
 					resultEl.textContent = '';
 					rebuild();
 				});
+			})();
+
+			// 반응속도 테스트 로직
+			(function initReactionTest(){
+				const box = document.getElementById('reaction-box');
+				const startBtn = document.getElementById('reaction-start');
+				const resetBtn = document.getElementById('reaction-reset');
+				const currentAttemptEl = document.getElementById('current-attempt');
+				const bestTimeEl = document.getElementById('best-time');
+				const timesEl = document.getElementById('reaction-times');
+				const resultEl = document.getElementById('reaction-result');
+				
+				let isWaiting = false;
+				let isGreen = false;
+				let startTime = 0;
+				let currentAttempt = 0;
+				let times = [];
+				let bestTime = Infinity;
+				
+				function setBoxColor(color, text) {
+					box.className = `reaction-box ${color}`;
+					box.querySelector('.reaction-text').textContent = text;
+				}
+				
+				function startTest() {
+					if (isWaiting) return;
+					
+					currentAttempt = 0;
+					times = [];
+					bestTime = Infinity;
+					updateStats();
+					timesEl.innerHTML = '';
+					resultEl.textContent = '';
+					
+					startBtn.disabled = true;
+					startBtn.textContent = '테스트 진행 중...';
+					
+					nextRound();
+				}
+				
+				function nextRound() {
+					if (currentAttempt >= 5) {
+						finishTest();
+						return;
+					}
+					
+					currentAttempt++;
+					updateStats();
+					
+					// 빨간색으로 시작
+					setBoxColor('red', '기다리세요...');
+					isWaiting = true;
+					isGreen = false;
+					
+					// 1.5-5초 후 초록색으로 변경
+					const delay = 2000 + Math.random() * 3000;
+					setTimeout(() => {
+						if (isWaiting) {
+							setBoxColor('green', '클릭하세요!');
+							isGreen = true;
+							startTime = performance.now();
+						}
+					}, delay);
+				}
+				
+				function handleClick() {
+					if (!isWaiting) return;
+					
+					if (!isGreen) {
+						// 빨간색일 때 클릭 - 무효, 다시 대기시간으로
+						setBoxColor('red', '너무 빨랐습니다!');
+						setTimeout(() => {
+							if (currentAttempt <= 5) {
+								// 다시 빨간색으로 시작하여 대기시간 재시작
+								setBoxColor('red', '기다리세요...');
+								isWaiting = true;
+								isGreen = false;
+								
+								// 1초 후 새로운 랜덤 대기시간 시작
+								setTimeout(() => {
+									// 1.5-5초 후 초록색으로 변경
+									const delay = 2000 + Math.random() * 3000;
+									setTimeout(() => {
+										if (isWaiting) {
+											setBoxColor('green', '클릭하세요!');
+											isGreen = true;
+											startTime = performance.now();
+										}
+									}, delay);
+								}, 1000);
+							}
+						}, 1000);
+						return;
+					}
+					
+					// 초록색일 때 클릭 - 유효
+					const reactionTime = Math.round(performance.now() - startTime);
+					times.push(reactionTime);
+					
+					if (reactionTime < bestTime) {
+						bestTime = reactionTime;
+						updateStats();
+					}
+					
+					// 결과 표시
+					timesEl.innerHTML += `<div class="time-item">시도 ${currentAttempt}: ${reactionTime}ms</div>`;
+					
+					setBoxColor('blue', `${reactionTime}ms`);
+					
+					setTimeout(() => {
+						if (currentAttempt < 5) {
+							nextRound();
+						} else {
+							finishTest();
+						}
+					}, 1000);
+				}
+				
+				function finishTest() {
+					isWaiting = false;
+					isGreen = false;
+					
+					const average = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+					
+					setBoxColor('blue', '완료!');
+					
+					resultEl.textContent = `🎉 반응속도 테스트 완료!\n\n평균 반응속도: ${average}ms\n최고 기록: ${bestTime}ms\n\n${getReactionComment(average)}`;
+					
+					startBtn.disabled = false;
+					startBtn.textContent = '다시 테스트';
+				}
+				
+				function getReactionComment(average) {
+					if (average < 200) return '🏆 엄청 빠릅니다!';
+					if (average < 300) return '⚡ 매우 빠릅니다!';
+					if (average < 400) return '👍 좋은 반응속도입니다!';
+					if (average < 500) return '😊 평균적인 반응속도입니다.';
+					return '🐌 조금 더 연습해보세요!';
+				}
+				
+				function updateStats() {
+					currentAttemptEl.textContent = currentAttempt;
+					bestTimeEl.textContent = bestTime === Infinity ? '-' : bestTime;
+				}
+				
+				function reset() {
+					isWaiting = false;
+					isGreen = false;
+					currentAttempt = 0;
+					times = [];
+					bestTime = Infinity;
+					
+					setBoxColor('gray', '클릭하여 시작');
+					updateStats();
+					timesEl.innerHTML = '';
+					resultEl.textContent = '';
+					
+					startBtn.disabled = false;
+					startBtn.textContent = '테스트 시작';
+				}
+				
+				// 이벤트 리스너
+				box.addEventListener('click', handleClick);
+				startBtn.addEventListener('click', startTest);
+				resetBtn.addEventListener('click', reset);
+				
+				// 초기화
+				reset();
 			})();
 	</script>
 </body>
