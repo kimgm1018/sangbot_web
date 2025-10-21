@@ -587,7 +587,7 @@
 					rungs.sort((a,b)=>a.y-b.y);
 				}
 
-				function drawLadder(){
+				function drawLadder(showRungs = true){
 					ctx.clearRect(0,0,canvas.width,canvas.height);
 					ctx.lineWidth = 3.5;
 					ctx.strokeStyle = '#2a5573';
@@ -598,15 +598,18 @@
 						ctx.lineTo(x, canvas.height - padding.bottom);
 						ctx.stroke();
 					}
-					// 가로발
-					ctx.lineWidth = 3;
-					for (const r of rungs){
-						const x1 = verticals[r.i];
-						const x2 = verticals[r.i+1];
-						ctx.beginPath();
-						ctx.moveTo(x1, r.y);
-						ctx.lineTo(x2, r.y);
-						ctx.stroke();
+					// 가로발 (조건부 표시)
+					if (showRungs) {
+						ctx.lineWidth = 3;
+						ctx.strokeStyle = '#ff6b6b';
+						for (const r of rungs){
+							const x1 = verticals[r.i];
+							const x2 = verticals[r.i+1];
+							ctx.beginPath();
+							ctx.moveTo(x1, r.y);
+							ctx.lineTo(x2, r.y);
+							ctx.stroke();
+						}
 					}
 					// 라벨 (상단 이름, 하단 결과)
 					const nameInputs = Array.from(namesWrap.querySelectorAll('input'));
@@ -749,30 +752,94 @@
 					const names = nameInputs.map((el,i)=> (el.value||`이름 ${i+1}`));
 					const foots = footInputs.map((el,i)=> (el.value||`결과 ${i+1}`));
 					setDisabled(true);
-					const paths = [];
-					for (let i=0;i<columns;i++) paths.push(computePath(i));
-					const mapping = new Array(columns);
-					function destIndexForPath(path){
-						const last = path[path.length-1];
-						const destX = last.x2;
-						return verticals.findIndex(v => Math.abs(v - destX) < 1e-6);
-					}
-					let cur = 0;
-					function next(){
-						if (cur >= columns){
-							const lines = mapping.map((toIdx, fromIdx)=> `${names[fromIdx]} → ${foots[toIdx]}`);
-							resultEl.textContent = lines.join('\n');
-							setDisabled(false);
-							return;
+					
+					// 가로선을 순차적으로 표시하는 애니메이션
+					let rungIndex = 0;
+					function showNextRung() {
+						if (rungIndex < rungs.length) {
+							// 현재까지의 가로선만 표시
+							drawLadderWithRungs(rungIndex + 1);
+							rungIndex++;
+							setTimeout(showNextRung, 300); // 0.3초 간격
+						} else {
+							// 모든 가로선이 표시된 후 경로 애니메이션 시작
+							startPathAnimation();
 						}
-						animatePath(paths[cur], ()=>{
-							mapping[cur] = destIndexForPath(paths[cur]);
-							cur++;
-							next();
-						});
 					}
-					drawLadder();
-					next();
+					
+					function startPathAnimation() {
+						const paths = [];
+						for (let i=0;i<columns;i++) paths.push(computePath(i));
+						const mapping = new Array(columns);
+						function destIndexForPath(path){
+							const last = path[path.length-1];
+							const destX = last.x2;
+							return verticals.findIndex(v => Math.abs(v - destX) < 1e-6);
+						}
+						let cur = 0;
+						function next(){
+							if (cur >= columns){
+								const lines = mapping.map((toIdx, fromIdx)=> `${names[fromIdx]} → ${foots[toIdx]}`);
+								resultEl.textContent = lines.join('\n');
+								setDisabled(false);
+								return;
+							}
+							animatePath(paths[cur], ()=>{
+								mapping[cur] = destIndexForPath(paths[cur]);
+								cur++;
+								next();
+							});
+						}
+						next();
+					}
+					
+					// 세로선만 먼저 표시
+					drawLadder(false);
+					// 가로선 순차 표시 시작
+					setTimeout(showNextRung, 500);
+				}
+				
+				function drawLadderWithRungs(visibleRungCount) {
+					ctx.clearRect(0,0,canvas.width,canvas.height);
+					ctx.lineWidth = 3.5;
+					ctx.strokeStyle = '#2a5573';
+					// 세로선
+					for (const x of verticals){
+						ctx.beginPath();
+						ctx.moveTo(x, padding.top);
+						ctx.lineTo(x, canvas.height - padding.bottom);
+						ctx.stroke();
+					}
+					// 가로발 (지정된 개수만 표시)
+					ctx.lineWidth = 3;
+					ctx.strokeStyle = '#ff6b6b';
+					for (let i = 0; i < Math.min(visibleRungCount, rungs.length); i++) {
+						const r = rungs[i];
+						const x1 = verticals[r.i];
+						const x2 = verticals[r.i+1];
+						ctx.beginPath();
+						ctx.moveTo(x1, r.y);
+						ctx.lineTo(x2, r.y);
+						ctx.stroke();
+					}
+					// 라벨 (상단 이름, 하단 결과)
+					const nameInputs = Array.from(namesWrap.querySelectorAll('input'));
+					const footInputs = Array.from(footsWrap.querySelectorAll('input'));
+					ctx.fillStyle = '#074b78';
+					ctx.font = 'bold 12px "Noto Sans KR", Arial';
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'bottom';
+					for (let i=0;i<verticals.length;i++){
+						const x = verticals[i];
+						const topLabel = (nameInputs[i]?.value || `이름 ${i+1}`);
+						ctx.fillText(topLabel, x, padding.top - 8);
+					}
+					ctx.textBaseline = 'top';
+					for (let i=0;i<verticals.length;i++){
+						const x = verticals[i];
+						const botLabel = (footInputs[i]?.value || `결과 ${i+1}`);
+						ctx.fillText(botLabel, x, canvas.height - padding.bottom + 8);
+					}
 				}
 
 				// 초기화 및 이벤트
@@ -780,7 +847,7 @@
 					const n = Math.max(2, Math.min(15, parseInt(countEl.value,10)||2));
 					buildInputs(n);
 					generateLadder(n);
-					drawLadder();
+					drawLadder(false); // 초기에는 가로선 숨김
 					// 개인 실행 버튼 생성
 					const btnWrap = document.getElementById('ladder-person-buttons');
 					if (btnWrap){
@@ -805,17 +872,39 @@
 					const names = nameInputs.map((el,i)=> (el.value||`이름 ${i+1}`));
 					const foots = footInputs.map((el,i)=> (el.value||`결과 ${i+1}`));
 					setDisabled(true);
-					const path = computePath(idx);
-					function destIndexForPath(path){
-						const last = path[path.length-1];
-						const destX = last.x2;
-						return verticals.findIndex(v => Math.abs(v - destX) < 1e-6);
+					
+					// 가로선을 순차적으로 표시하는 애니메이션
+					let rungIndex = 0;
+					function showNextRung() {
+						if (rungIndex < rungs.length) {
+							// 현재까지의 가로선만 표시
+							drawLadderWithRungs(rungIndex + 1);
+							rungIndex++;
+							setTimeout(showNextRung, 300); // 0.3초 간격
+						} else {
+							// 모든 가로선이 표시된 후 경로 애니메이션 시작
+							startSinglePathAnimation();
+						}
 					}
-					animatePath(path, ()=>{
-						const toIdx = destIndexForPath(path);
-						resultEl.textContent = `${names[idx]} → ${foots[toIdx]}`;
-						setDisabled(false);
-					});
+					
+					function startSinglePathAnimation() {
+						const path = computePath(idx);
+						function destIndexForPath(path){
+							const last = path[path.length-1];
+							const destX = last.x2;
+							return verticals.findIndex(v => Math.abs(v - destX) < 1e-6);
+						}
+						animatePath(path, ()=>{
+							const toIdx = destIndexForPath(path);
+							resultEl.textContent = `${names[idx]} → ${foots[toIdx]}`;
+							setDisabled(false);
+						});
+					}
+					
+					// 세로선만 먼저 표시
+					drawLadder(false);
+					// 가로선 순차 표시 시작
+					setTimeout(showNextRung, 500);
 				}
 				resetBtn.addEventListener('click', ()=>{
 					resultEl.textContent = '';
