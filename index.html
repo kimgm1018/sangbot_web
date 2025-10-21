@@ -188,7 +188,7 @@
 				<p class="help">빨간색일 때는 클릭하지 마세요! 초록색으로 바뀌면 빠르게 클릭하세요.</p>
 				
 				<div class="reaction-container">
-					<div id="reaction-box" class="reaction-box">
+					<div id="reaction-box" class="reaction-box" onclick="startReactionTest()">
 						<div class="reaction-text">클릭하여 시작</div>
 					</div>
 					
@@ -219,6 +219,30 @@
 	</div>
 
 	<script>
+		// 전역 함수들
+		let reactionTestData = {
+			isWaiting: false,
+			isGreen: false,
+			startTime: 0,
+			currentAttempt: 0,
+			times: [],
+			bestTime: Infinity
+		};
+		
+		function startReactionTest() {
+			if (!reactionTestData.isWaiting && reactionTestData.times.length === 0) {
+				// 기존 테스트 시작 로직 호출
+				if (window.reactionStartFunction) {
+					window.reactionStartFunction();
+				}
+			} else {
+				// 기존 클릭 처리 로직 호출
+				if (window.reactionClickFunction) {
+					window.reactionClickFunction();
+				}
+			}
+		}
+		
 		// 네비게이션 전환
 		document.querySelectorAll('.nav-item').forEach(btn => {
 			btn.addEventListener('click', () => {
@@ -959,24 +983,35 @@
 				const timesEl = document.getElementById('reaction-times');
 				const resultEl = document.getElementById('reaction-result');
 				
-				let isWaiting = false;
-				let isGreen = false;
-				let startTime = 0;
-				let currentAttempt = 0;
-				let times = [];
-				let bestTime = Infinity;
+				// 타이머 관리
+				let currentTimer = null;
+				let greenTimer = null;
 				
 				function setBoxColor(color, text) {
 					box.className = `reaction-box ${color}`;
 					box.querySelector('.reaction-text').textContent = text;
 				}
 				
+				function clearAllTimers() {
+					if (currentTimer) {
+						clearTimeout(currentTimer);
+						currentTimer = null;
+					}
+					if (greenTimer) {
+						clearTimeout(greenTimer);
+						greenTimer = null;
+					}
+				}
+				
 				function startTest() {
-					if (isWaiting) return;
+					if (reactionTestData.isWaiting) return;
 					
-					currentAttempt = 0;
-					times = [];
-					bestTime = Infinity;
+					// 모든 타이머 정리
+					clearAllTimers();
+					
+					reactionTestData.currentAttempt = 0;
+					reactionTestData.times = [];
+					reactionTestData.bestTime = Infinity;
 					updateStats();
 					timesEl.innerHTML = '';
 					resultEl.textContent = '';
@@ -988,52 +1023,58 @@
 				}
 				
 				function nextRound() {
-					if (currentAttempt >= 5) {
+					if (reactionTestData.currentAttempt >= 5) {
 						finishTest();
 						return;
 					}
 					
-					currentAttempt++;
+					// 이전 타이머 정리
+					clearAllTimers();
+					
+					reactionTestData.currentAttempt++;
 					updateStats();
 					
 					// 빨간색으로 시작
 					setBoxColor('red', '기다리세요...');
-					isWaiting = true;
-					isGreen = false;
+					reactionTestData.isWaiting = true;
+					reactionTestData.isGreen = false;
 					
-					// 1.5-5초 후 초록색으로 변경
+					// 2-5초 후 초록색으로 변경
 					const delay = 2000 + Math.random() * 3000;
-					setTimeout(() => {
-						if (isWaiting) {
+					greenTimer = setTimeout(() => {
+						if (reactionTestData.isWaiting) {
 							setBoxColor('green', '클릭하세요!');
-							isGreen = true;
-							startTime = performance.now();
+							reactionTestData.isGreen = true;
+							reactionTestData.startTime = performance.now();
 						}
 					}, delay);
 				}
 				
 				function handleClick() {
-					if (!isWaiting) return;
+					if (!reactionTestData.isWaiting) return;
 					
-					if (!isGreen) {
+					if (!reactionTestData.isGreen) {
 						// 빨간색일 때 클릭 - 무효, 다시 대기시간으로
+						clearAllTimers();
 						setBoxColor('red', '너무 빨랐습니다!');
-						setTimeout(() => {
-							if (currentAttempt <= 5) {
-								// 다시 빨간색으로 시작하여 대기시간 재시작
+						
+						// 1초 후 다시 시작
+						currentTimer = setTimeout(() => {
+							if (reactionTestData.currentAttempt <= 5) {
+								// 다시 빨간색으로 시작
 								setBoxColor('red', '기다리세요...');
-								isWaiting = true;
-								isGreen = false;
+								reactionTestData.isWaiting = true;
+								reactionTestData.isGreen = false;
 								
 								// 1초 후 새로운 랜덤 대기시간 시작
-								setTimeout(() => {
-									// 1.5-5초 후 초록색으로 변경
+								currentTimer = setTimeout(() => {
+									// 2-5초 후 초록색으로 변경
 									const delay = 2000 + Math.random() * 3000;
-									setTimeout(() => {
-										if (isWaiting) {
+									greenTimer = setTimeout(() => {
+										if (reactionTestData.isWaiting) {
 											setBoxColor('green', '클릭하세요!');
-											isGreen = true;
-											startTime = performance.now();
+											reactionTestData.isGreen = true;
+											reactionTestData.startTime = performance.now();
 										}
 									}, delay);
 								}, 1000);
@@ -1043,21 +1084,23 @@
 					}
 					
 					// 초록색일 때 클릭 - 유효
-					const reactionTime = Math.round(performance.now() - startTime);
-					times.push(reactionTime);
+					clearAllTimers();
 					
-					if (reactionTime < bestTime) {
-						bestTime = reactionTime;
+					const reactionTime = Math.round(performance.now() - reactionTestData.startTime);
+					reactionTestData.times.push(reactionTime);
+					
+					if (reactionTime < reactionTestData.bestTime) {
+						reactionTestData.bestTime = reactionTime;
 						updateStats();
 					}
 					
 					// 결과 표시
-					timesEl.innerHTML += `<div class="time-item">시도 ${currentAttempt}: ${reactionTime}ms</div>`;
+					timesEl.innerHTML += `<div class="time-item">시도 ${reactionTestData.currentAttempt}: ${reactionTime}ms</div>`;
 					
 					setBoxColor('blue', `${reactionTime}ms`);
 					
-					setTimeout(() => {
-						if (currentAttempt < 5) {
+					currentTimer = setTimeout(() => {
+						if (reactionTestData.currentAttempt < 5) {
 							nextRound();
 						} else {
 							finishTest();
@@ -1066,14 +1109,15 @@
 				}
 				
 				function finishTest() {
-					isWaiting = false;
-					isGreen = false;
+					clearAllTimers();
+					reactionTestData.isWaiting = false;
+					reactionTestData.isGreen = false;
 					
-					const average = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+					const average = Math.round(reactionTestData.times.reduce((a, b) => a + b, 0) / reactionTestData.times.length);
 					
 					setBoxColor('blue', '완료!');
 					
-					resultEl.textContent = `🎉 반응속도 테스트 완료!\n\n평균 반응속도: ${average}ms\n최고 기록: ${bestTime}ms\n\n${getReactionComment(average)}`;
+					resultEl.textContent = `🎉 반응속도 테스트 완료!\n\n평균 반응속도: ${average}ms\n최고 기록: ${reactionTestData.bestTime}ms\n\n${getReactionComment(average)}`;
 					
 					startBtn.disabled = false;
 					startBtn.textContent = '다시 테스트';
@@ -1088,16 +1132,17 @@
 				}
 				
 				function updateStats() {
-					currentAttemptEl.textContent = currentAttempt;
-					bestTimeEl.textContent = bestTime === Infinity ? '-' : bestTime;
+					currentAttemptEl.textContent = reactionTestData.currentAttempt;
+					bestTimeEl.textContent = reactionTestData.bestTime === Infinity ? '-' : reactionTestData.bestTime;
 				}
 				
 				function reset() {
-					isWaiting = false;
-					isGreen = false;
-					currentAttempt = 0;
-					times = [];
-					bestTime = Infinity;
+					clearAllTimers();
+					reactionTestData.isWaiting = false;
+					reactionTestData.isGreen = false;
+					reactionTestData.currentAttempt = 0;
+					reactionTestData.times = [];
+					reactionTestData.bestTime = Infinity;
 					
 					setBoxColor('gray', '클릭하여 시작');
 					updateStats();
@@ -1108,8 +1153,9 @@
 					startBtn.textContent = '테스트 시작';
 				}
 				
-				// 이벤트 리스너
-				box.addEventListener('click', handleClick);
+				// 전역 함수로 노출
+				window.reactionStartFunction = startTest;
+				window.reactionClickFunction = handleClick;
 				startBtn.addEventListener('click', startTest);
 				resetBtn.addEventListener('click', reset);
 				
